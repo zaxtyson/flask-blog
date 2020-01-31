@@ -1,0 +1,29 @@
+<html>
+<head>
+    {% if title %}
+        <title>{{ title }} - Microblog</title>
+    {% else %}
+        <title>Welcome to Microblog</title>
+    {% endif %}
+</head>
+<body>
+<div>
+    Microblog:
+    <a href="{{ url_for('index') }}">主页</a>
+    <a href="{{ url_for('login') }}">登录</a>
+    <a href="{{ url_for('logout') }}">登出</a>
+    <hr>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for msg in messages %}
+                    <li>{{ msg }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+</div>
+<hr>
+{% block content %}{% endblock %}
+</body>
+</html>
