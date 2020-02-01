@@ -3,6 +3,7 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import login
+from hashlib import md5
 
 
 class User(UserMixin, db.Model):
@@ -14,6 +15,8 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
+    about_me = db.Column(db.String(140))
+    last_seen = db.Column(db.DateTime, default=datetime.utcnow)     # 用户最近一次的登录时间
     posts = db.relationship('Post', backref='author', lazy='dynamic')
 
     def __repr__(self):
@@ -27,6 +30,13 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         """检测明文密码是否与 hash 对应,用于登录检测"""
         return check_password_hash(self.password_hash, password)
+
+    def avatar(self, size):
+        """获取用户头像链接
+        参数详情: https://gravatar.com/site/implement/images
+        """
+        digest = md5(self.email.lower().encode('utf-8')).hexdigest()
+        return f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}'
 
 
 class Post(db.Model):

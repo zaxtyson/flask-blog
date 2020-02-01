@@ -1,9 +1,18 @@
 from app import app, db
 from flask import render_template, flash, redirect, url_for, request
-from app.forms import LoginForm, RegistrationForm
+from app.forms import LoginForm, RegistrationForm, EditProfileForm
 from flask_login import logout_user, login_user, current_user, login_required
 from app.models import User
 from werkzeug.urls import url_parse
+from datetime import datetime
+
+
+@app.before_request
+def before_request():
+    """更新登录用户的活跃时间"""
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.utcnow()
+        db.session.commit()
 
 
 @app.route('/')
@@ -70,3 +79,33 @@ def register():
         flash('注册成功!')
         return redirect(url_for('login'))
     return render_template('register.html', title='注册页面', form=form)
+
+
+@app.route('/user/<username>')
+@login_required
+def user(username):
+    """个人中心页"""
+    user = User.query.filter_by(username=username).first_or_404()   # 没有找到用户,抛出异常,返回 404 页面
+    posts = [
+        {'author': user, 'body': 'Test post #1'},
+        {'author': user, 'body': 'Test post #2'}
+    ]
+    return render_template('user.html', user=user, posts=posts)
+
+
+@app.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    """编辑用户信息页"""
+    form = EditProfileForm(current_user.username)
+    if request.method == 'GET':   # 直接访问时，设置表单默认状态
+        form.username.data = current_user.username
+        form.about_me.data = current_user.about_me
+    elif form.validate_on_submit():   # 表单验证通过后更新数据库
+        current_user.username = form.username.data
+        current_user.about_me = form.about_me.data
+        db.session.commit()
+        flash("个人信息更新成功")
+        return redirect(url_for('edit_profile'))
+
+    return render_template('edit_profile.html', title='更新用户信息', form=form)
