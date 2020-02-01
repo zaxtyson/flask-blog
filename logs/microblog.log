@@ -74,3 +74,5 @@ sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) UNIQUE constraint failed
 [parameters: ('jack1', 1)]
 (Background on this error at: http://sqlalche.me/e/gkpj)
 2020-02-01 14:10:34,458 INFO [in D:\Documents\PycharmProjects\flask_test\app\__init__.py:47]: -------------------------------------------------- Microblog startup --------------------------------------------------
+2020-02-01 15:47:44,082 INFO [in D:\Documents\PycharmProjects\flask_test\app\__init__.py:47]: -------------------------------------------------- Microblog startup --------------------------------------------------
+2020-02-01 15:47:50,712 INFO [in D:\Documents\PycharmProjects\flask_test\app\__init__.py:47]: -------------------------------------------------- Microblog startup --------------------------------------------------

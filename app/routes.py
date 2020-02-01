@@ -109,3 +109,37 @@ def edit_profile():
         return redirect(url_for('edit_profile'))
 
     return render_template('edit_profile.html', title='更新用户信息', form=form)
+
+
+@app.route('/follow/<username>')
+@login_required
+def follow(username):
+    """关注一个用户"""
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash(f'关注的用户 {username} 不存在')
+        return redirect(url_for('index'))
+    if user == current_user:
+        flash('不能关注你自己的啦')
+        return redirect(url_for('index'))
+    current_user.follow(user)
+    db.session.commit()
+    flash(f'你关注了 {username}')
+    return redirect(url_for('user', username=username))
+
+
+@app.route('/unfollow/<username>')
+@login_required
+def unfollow(username):
+    """取消关注用户"""
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash(f'用户 {username} 不存在啊')
+        return redirect(url_for('index'))
+    if user == current_user:
+        flash(f'不能取消关注自己哦')
+        return redirect(url_for('index'))
+    current_user.unfollow(user)
+    db.session.commit()
+    flash(f'你已经取消关注 {username}')
+    return redirect(url_for('user', username=username))
